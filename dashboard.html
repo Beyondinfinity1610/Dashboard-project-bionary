@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vision UI Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      background: #101c32;
+      font-family: 'Inter', sans-serif;
+      color: #fff;
+    }
+    .vui-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 220px;
+      height: 100vh;
+      background: #172042;
+      padding: 32px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .vui-sidebar h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0 0 24px 32px;
+      letter-spacing: 2px;
+    }
+    .vui-sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-left: 32px;
+    }
+    .vui-sidebar a {
+      color: #b6c0e0;
+      text-decoration: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      transition: background 0.2s;
+      font-weight: 500;
+    }
+    .vui-sidebar a.vui-active,
+    .vui-sidebar a:hover {
+      background: #23305a;
+      color: #fff;
+    }
+    .vui-main-content {
+      margin-left: 240px;
+      padding: 32px 40px;
+      background: linear-gradient(135deg, #0e1525 70%, #1a2b4d 100%);
+      min-height: 100vh;
+    }
+    .vui-dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    .vui-dashboard-header input {
+      background: #182a4d;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      color: #fff;
+      width: 220px;
+    }
+    .vui-dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .vui-dashboard-card {
+      background: #172042;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 2px 12px 0 rgba(10, 20, 50, 0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 90px;
+      min-width: autoexpand;
+      box-sizing: border-box;
+    }
+    .vui-dashboard-card .vui-title {
+      font-size: 0.9rem;
+      color: #7ea1e6;
+      margin-bottom: 6px;
+    }
+    .vui-dashboard-card .vui-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .vui-dashboard-card .vui-change {
+      font-size: 0.9rem;
+      color: #3edb8b;
+    }
+    .vui-dashboard-card .vui-change.vui-negative {
+      color: #ff5e7a;
+    }
+    .vui-dashboard-welcome {
+      grid-column: span 2;
+      background: linear-gradient(120deg, #1a2b4d 60%, #23305a 100%);
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .vui-dashboard-welcome img {
+      width: 120px;
+      opacity: 0.6;
+      border-radius: 16px;
+    }
+    .vui-dashboard-welcome .vui-welcome-text {
+      flex: 1;
+    }
+    .vui-dashboard-welcome .vui-welcome-text h3 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    .vui-dashboard-welcome .vui-welcome-text p {
+      margin: 8px 0 0 0;
+      color: #b6c0e0;
+      font-size: 1rem;
+    }
+    .vui-dashboard-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .vui-dashboard-panel {
+      background: #172042;
+      border-radius: 18px;
+      padding: 24px;
+      min-height: 220px;
+    }
+    .vui-dashboard-panel h4 {
+      margin: 0 0 16px 0;
+      font-size: 1.1rem;
+      color: #7ea1e6;
+    }
+    /* Example chart styles */
+    .vui-chart-placeholder {
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(90deg, #1a2b4d 60%, #23305a 100%);
+      border-radius: 12px;
+      margin-top: 16px;
+      opacity: 0.7;
+    }
+    .vui-dashboard-panel .vui-stat {
+      font-size: 2.1rem;
+      font-weight: 600;
+      color: #3edb8b;
+      margin: 20px 0 0 0;
+    }
+    .vui-dashboard-panel .vui-stat-label {
+      color: #b6c0e0;
+      font-size: 1rem;
+    }
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .vui-dashboard-grid,
+      .vui-dashboard-row {
+        grid-template-columns: 1fr 1fr;
+      }
+      .vui-main-content {
+        padding: 24px;
+      }
+    }
+    @media (max-width: 800px) {
+      .vui-sidebar {
+        width: 60px;
+        padding: 16px 0;
+      }
+      .vui-sidebar h2,
+      .vui-sidebar nav a:not(.vui-active) {
+        display: none;
+      }
+      .vui-main-content {
+        margin-left: 70px;
+        padding: 16px;
+      }
+      .vui-dashboard-grid,
+      .vui-dashboard-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Stats Bargraph */
+    .vui-stats-bargraph {
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
+    .vui-bargraph-legend {
+      margin-bottom: 14px;
+      font-size: 0.95em;
+      color: #b6c0e0;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+    .vui-legend-item {
+      display: inline-block;
+      width: 14px;
+      height: 8px;
+      border-radius: 3px;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    .vui-legend-item.user {
+      background: #3edb8b;
+    }
+    .vui-legend-item.topper {
+      background: #2e6fff;
+    }
+    .vui-legend-item.avg {
+      background: #7ea1e6;
+    }
+    .vui-bargraph {
+      display: flex;
+      gap: 36px;
+      align-items: flex-end;
+      height: 120px;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+    .vui-bargroup {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 48px;
+    }
+    .vui-bar {
+      width: 12px;
+      margin: 0 2px;
+      border-radius: 5px 5px 0 0;
+      background: #7ea1e6;
+      box-shadow: 0 2px 8px 0 rgba(10, 20, 50, 0.10);
+      transition: height 0.3s;
+      display: inline-block;
+    }
+    .vui-bar.user {
+      background: #3edb8b;
+    }
+    .vui-bar.topper {
+      background: #2e6fff;
+    }
+    .vui-bar.avg {
+      background: #7ea1e6;
+    }
+    .vui-bar-label {
+      margin-top: 8px;
+      color: #b6c0e0;
+      font-size: 0.95em;
+      font-weight: 500;
+    }
+    .vui-stats-summary {
+      margin-top: 10px;
+      color: #fff;
+      font-size: 1em;
+      line-height: 1.6;
+    }
+
+    /* Stat1 Bargraph */
+    .vui-stat1-bargraph {
+      min-height: 250px;
+      min-width: full-width;
+      background: #172042;
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 12px 0 rgba(10, 20, 50, 0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
+    .vui-bargraph-legend {
+      margin-bottom: 14px;
+      font-size: 0.93em;
+      color: #b6c0e0;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+    .vui-legend-item {
+      display: inline-block;
+      width: 14px;
+      height: 8px;
+      border-radius: 3px;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    .vui-legend-item.web {
+      background: #3edb8b;
+    }
+    .vui-legend-item.app {
+      background: #2e6fff;
+    }
+    .vui-legend-item.dsa {
+      background: #ff5e7a;
+    }
+    .vui-bargraph.vui-stat1 {
+      display: flex;
+      gap: 36px;
+      align-items: flex-end;
+      height: 120px;
+      width: 100%;
+      margin-bottom: 16px;
+      margin-top: 10px;
+    }
+    .vui-bargroup {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 60px;
+    }
+    .vui-bar {
+      width: 22px;
+      margin: 0 2px;
+      border-radius: 6px 6px 0 0;
+      background: #7ea1e6;
+      box-shadow: 0 2px 8px 0 rgba(10, 20, 50, 0.10);
+      transition: height 0.3s;
+      display: inline-block;
+    }
+    .vui-bar.web {
+      background: #3edb8b;
+    }
+    .vui-bar.app {
+      background: #2e6fff;
+    }
+    .vui-bar.dsa {
+      background: #ff5e7a;
+    }
+    .vui-bar-label {
+      margin-top: 8px;
+      color: #b6c0e0;
+      font-size: 0.96em;
+      font-weight: 500;
+      text-align: center;
+    }
+    .vui-stats-summary {
+      margin-top: 12px;
+      color: #fff;
+      font-size: 1em;
+      line-height: 1.6;
+    }
+
+
+  </style>
+</head>
+<body>
+  <div class="vui-sidebar">
+    <h2>BIONARY</h2>
+    <nav>
+      <a href="#" class="vui-active">Dashboard</a>
+      <a href="#">Tables</a>
+      <a href="#">Events Participated</a>
+      <a href="#">Upcoming Events</a>
+      <a href="#">Courses</a>
+      <a href="#">Sign In</a>
+      <a href="#">Sign Up</a>
+    </nav>
+  </div>
+  <div class="vui-main-content">
+    <div class="vui-dashboard-header">
+      <h1>Dashboard</h1>
+      <input type="text" placeholder="Type here..." />
+    </div>
+    <div class="vui-dashboard-welcome">
+      <img
+        src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80"
+        alt="Jellyfish"
+      />
+      <div class="vui-welcome-text">
+        <h3>Welcome back, {{username}}</h3>
+        <p>Glad to see you again! Ask me anything.</p>
+      </div>
+    </div>
+    <br />
+    <div class="vui-dashboard-grid">
+      <div class="vui-dashboard-card">
+        <div class="vui-title">Today's Active Hours</div>
+        <div class="vui-value">{{hours}} hrs</div>
+        <div class="vui-change">+{{percentChange}} % from last date</div>
+      </div>
+      <div class="vui-dashboard-card">
+        <div class="vui-title">Weekly Active Hours</div>
+        <div class="vui-value">{{hourWeek}} hrs</div>
+        <div class="vui-change">+{{percentChangeW}} % from last week</div>
+      </div>
+      <div class="vui-dashboard-card">
+        <div class="vui-title">Monthly Active Hours</div>
+        <div class="vui-value">{{hourMonth}} hrs</div>
+        <div class="vui-change vui-negative">-{{percentChangeM}} % from last month</div>
+      </div>
+      
+      <div class="vui-dashboard-card">
+        <div class="vui-title"></div>
+        <div class="vui-value">Web Development</div>
+        <div class="vui-change">{{completedPercentWEB}} %</div>
+      </div>
+      <div class="vui-dashboard-card">
+        <div class="vui-title"></div>
+        <div class="vui-value">App Development</div>
+        <div class="vui-change">{{completedPercentAPP}} %</div>
+      </div>
+      <div class="vui-dashboard-card">
+        <div class="vui-title"></div>
+        <div class="vui-value">DSA</div>
+        <div class="vui-change">{{completedPercentDSA}} %</div>
+      </div>
+      <!--
+      <div class="vui-dashboard-card">
+        <div class="vui-title">Club Ranking</div>
+        <div class="vui-value">{{rank}}</div>
+        <div class="vui-change">Total Score - {{score}}</div>
+      </div>
+    -->
+      <div class="vui-dashboard-panel vui-stats-bargraph">
+        <h4>Hours Worked</h4>
+        <div class="vui-bargraph-legend">
+          <span class="vui-legend-item user"></span> You
+          <span class="vui-legend-item topper"></span> Topper
+          <span class="vui-legend-item avg"></span> Average
+        </div>
+        <div class="vui-bargraph">
+          <div class="vui-bargroup">
+            <div class="vui-bar user" style="height: 60%"></div>
+            <div class="vui-bar topper" style="height: 80%"></div>
+            <div class="vui-bar avg" style="height: 70%"></div>
+            <div class="vui-bar-label">Day</div>
+          </div>
+          <div class="vui-bargroup">
+            <div class="vui-bar user" style="height: 75%"></div>
+            <div class="vui-bar topper" style="height: 95%"></div>
+            <div class="vui-bar avg" style="height: 80%"></div>
+            <div class="vui-bar-label">Week</div>
+          </div>
+          <div class="vui-bargroup">
+            <div class="vui-bar user" style="height: 90%"></div>
+            <div class="vui-bar topper" style="height: 100%"></div>
+            <div class="vui-bar avg" style="height: 85%"></div>
+            <div class="vui-bar-label">Month</div>
+          </div>
+        </div>
+        <div class="vui-stats-summary">
+          <div>Today: <b>6 hrs</b></div>
+          <div>This Week: <b>38 hrs</b></div>
+          <div>This Month: <b>154 hrs</b></div>
+          <div style="margin-top: 8px; color: #7ea1e6; font-size: 0.95em;">
+            Compared to Topper &amp; Average
+          </div>
+        </div>
+      </div>
+
+      <div class="vui-dashboard-panel vui-stat1-bargraph">
+                    <h4>Knowledge gained</h4>
+        <div class="vui-bargraph-legend">
+          <span class="vui-legend-item web"></span> Web Dev
+          <span class="vui-legend-item app"></span> App Dev
+          <span class="vui-legend-item dsa"></span> DSA
+        </div>
+        <div class="vui-bargraph vui-stat1">
+          <div class="vui-bargroup">
+            <div class="vui-bar web" style="height: 85%;" title="Web Dev: 85%"></div>
+            <div class="vui-bar-label">Web Dev</div>
+          </div>
+          <div class="vui-bargroup">
+            <div class="vui-bar app" style="height: 65%;" title="App Dev: 65%"></div>
+            <div class="vui-bar-label">App Dev</div>
+          </div>
+          <div class="vui-bargroup">
+            <div class="vui-bar dsa" style="height: 50%;" title="DSA: 50%"></div>
+            <div class="vui-bar-label">DSA</div>
+          </div>
+        </div>
+        <div class="vui-stats-summary">
+          <div>Web Dev: <b>85% completed</b></div>
+          <div>App Dev: <b>65% completed</b></div>
+          <div>DSA: <b>50% completed</b></div>
+          <div style="margin-top: 8px; color: #7ea1e6; font-size: 0.95em;">
+            Progress based on your learning path
+          </div>
+        </div>
+      </div>
+
+      <div class="vui-dashboard-panel">
+        <h4>Recent Activity</h4>
+        <div class="vui-stat">Total Hours: 200 hrs</div>
+        <div class="vui-stat-label">Last Updated: 2 hours ago</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
